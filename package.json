@@ -1,0 +1,31 @@
+{
+    "builders": [
+    {
+        "type": "googlecompute",
+        "instance_name": "{{user `name`}}",
+        "image_name": "{{user `name`}}",
+        "account_file": "{{user `account_file`}}",
+        "project_id": "{{user `project_id`}}",
+        "source_image_family": "{{user `source_image_family`}}",
+        "ssh_username": "{{user `ssh_username`}}",
+        "zone": "{{user `zone`}}",
+        "machine_type": "{{user `machine_type`}}",
+        "disk_size": 20,
+        "disk_type": "{{user `disk_type`}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sleep 10",
+        "uname -a",
+        "uptime"
+      ]
+    },
+    {
+      "type": "shell",
+      "script": "shell.sh"
+    }
+  ]
+}
