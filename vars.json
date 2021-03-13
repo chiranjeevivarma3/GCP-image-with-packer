@@ -1,0 +1,11 @@
+{
+   "project_id": "",
+   "account_file": "",
+   "instance_name": "",
+   "image_name": "packergcp-{{timestamp}}",
+   "source_image_family": "ubuntu-2004-lts",
+   "zone": "us-central1-a",
+   "ssh_username": "packer",
+   "machine_type": "e2-medium",
+   "disk_type": "pd-balanced"
+ }
