@@ -1,0 +1,38 @@
+{
+    "builders": [
+    {
+      "type": "amazon-ebs",
+      "access_key": "",
+      "secret_key": "",
+      "region": "ap-south-1",
+      "vpc_id": "vpc-90618dfb",
+      "subnet_id": "subnet-98dacff0",
+      "associate_public_ip_address": true,
+      "security_group_id": "sg-0b5085165bd756d56",
+      "source_ami": "ami-0e8710d48cc4ea8dd",
+      "instance_type": "t2.micro",
+      "ssh_username": "ubuntu",
+      "ami_name": "chiru",
+      "ami_groups": "all",
+      "tags": {
+            "Name": "amipacker"
+        }
+    }
+  ],
+    "provisioners": [
+    {
+      "type": "ansible",
+      "host_alias": "ubuntu",
+      "playbook_file": "azure.yml"
+      
+    },       
+    {
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+    "inline": [
+      "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
+    ],
+    "inline_shebang": "/bin/sh -x",
+    "type": "shell"
+    }
+  ]
+}

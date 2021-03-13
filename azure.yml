@@ -1,0 +1,158 @@
+---
+- hosts: gensynth
+  become_user: root
+  become: true
+  gather_facts: false
+  vars:
+    docker_user: jenkins 
+
+  tasks:
+  - name: Update apt-get repo and cache
+    ignore_errors: yes 
+    apt:
+      update_cache: yes
+      force_apt_get: yes
+      cache_valid_time: 3600
+
+  - name: Install unzip tool
+    package:
+      name: unzip
+      state: latest
+
+  - name: Install uuidgen tool
+    package:
+      name: uuid
+      state: latest
+
+  - name: Install java runtime
+    package:
+      name: default-jre
+      state: latest
+ 
+  - name: Install docker runtime
+    package:
+      name: docker.io
+      state: latest
+
+  - name: get remote OS version
+    shell: "echo $(uname -s)-$(uname -m)"
+    register: os_version
+
+  - name: Install docker-compose
+    become: yes
+    get_url:
+      url: "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-{{os_version.stdout}}"
+      dest: /usr/local/bin/docker-compose
+      mode: 0555
+
+  - name: Add user to docker group
+    replace:
+      path: /etc/group
+      regexp: '((^docker.*$))'
+      replace: '\1{{docker_user}}'
+
+  - name: Install pip3
+    package:
+      name: python3-pip
+      state: latest
+
+  - name: Install setuptools needed for pip
+    package:
+      name: python-setuptools
+      state: latest
+
+  - name: pytest install
+    pip:
+      name: pytest
+      executable: pip3
+
+  - name: selenium install
+    pip:
+      name: selenium
+      executable: pip3
+
+  - name: chromedriver install
+    unarchive:
+      src: https://chromedriver.storage.googleapis.com/85.0.4183.87/chromedriver_linux64.zip
+      remote_src: yes
+      dest: /usr/bin
+
+  - name: pip3 install robotframework
+    pip:
+      name: robotframework
+      executable: pip3
+
+  - name: pip3 install dateparser
+    pip: 
+      name: dateparser
+      executable: pip3    
+
+  - name: install maven
+    package: 
+      name: maven
+      state: latest
+
+  - name: install unixodbc-dev
+    package: 
+      name: unixodbc-dev
+      state: latest
+
+  - name: pyodbc install
+    pip:
+      name: pyodbc
+      executable: pip3
+  
+  - name: Install odbc-postgres driver
+    apt:
+      name: odbc-postgresql
+      state: latest
+      update_cache: true
+
+  - name: python3 -m pip3 install awscli --user --upgrade
+    pip:
+      name: awscli
+      executable: pip3
+
+  - name: Add nvidia key to repo
+    apt_key:
+      url: https://nvidia.github.io/nvidia-docker/gpgkey
+      state: present
+
+  - name: Add the package repositories.
+    shell: |
+        distribution=$(. /etc/os-release;echo $ID$VERSION_ID) 
+        curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list 
+        
+  - name: Update apt-get repo
+    ignore_errors: yes
+    apt:
+      update_cache: yes
+      allow_unauthenticated: yes
+
+  - name: Install Nvidia Docker 2.0
+    apt:
+      name: nvidia-docker2
+      state: latest
+      update_cache: true
+
+  - name: Add nvidia driver package
+    apt_repository:
+      repo: 'ppa:graphics-drivers/ppa'
+
+  - name: Update nvidia driver
+    apt:
+      name: nvidia-driver-455
+      state: latest
+      update_cache: true
+  
+  - name: pip3 install numpy
+    pip: 
+      name: numpy
+      executable: pip3  
+  
+  - name: Install jq package
+    apt:
+      name: jq
+      state: latest
+      update_cache: true
+
